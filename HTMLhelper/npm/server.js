@@ -5,6 +5,11 @@ const bcrypt = require("bcryptjs");
 const session = require("express-session");
 const cors = require("cors");
 
+
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log("MongoDB connected"))
+    .catch(err => console.error("MongoDB connection error:", err));
+
 const app = express();
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:5500", credentials: true })); // Adjust for your frontend
