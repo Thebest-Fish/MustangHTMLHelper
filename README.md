@@ -6,9 +6,9 @@ step 2 click the `Terminal` from the bottom right corner of the `codespace`.
 
 step 3 run
 ```
-cd Games/npm/
-npm install express-session
-npm install express cors body-parser bcryptjs
+cd HTMLhelper/npm/
+npm install express mongoose dotenv bcryptjs express-session cors
 npm start
-step 4 click open in browser
 ```
+step 4 click open in browser
+
