@@ -8,17 +8,15 @@ const MongoStore = require("connect-mongo");
 
 const app = express();
 
-// 🔹 Connect to MongoDB (Only Once)
+// 🔹 Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log("✅ MongoDB connected"))
     .catch(err => console.error("❌ MongoDB connection error:", err));
 
 app.use(express.json());
-
-// 🔹 Enable CORS for Frontend
 app.use(cors({ origin: "http://localhost:5500", credentials: true }));
 
-// 🔹 Setup Session Middleware (Use MongoDB Store for Sessions)
+// 🔹 Setup Session Middleware
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -31,6 +29,7 @@ app.use(session({
 const userSchema = new mongoose.Schema({
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
+    progress: { type: Object, default: {} }  // Stores user progress
 });
 const User = mongoose.model("User", userSchema);
 
@@ -38,7 +37,7 @@ const User = mongoose.model("User", userSchema);
 app.post("/register", async (req, res) => {
     const { email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     try {
         const newUser = await User.create({ email, password: hashedPassword });
         res.json({ success: true, message: "✅ User registered!" });
@@ -71,6 +70,36 @@ app.get("/check-auth", (req, res) => {
         res.json({ authenticated: true });
     } else {
         res.json({ authenticated: false });
+    }
+});
+
+// 🔹 Save User Progress
+app.post("/save-progress", async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const { progress } = req.body;
+
+    try {
+        await User.findByIdAndUpdate(req.session.user, { progress });
+        res.json({ success: true, message: "✅ Progress saved!" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "❌ Error saving progress" });
+    }
+});
+
+// 🔹 Get User Progress
+app.get("/get-progress", async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const user = await User.findById(req.session.user);
+    if (user) {
+        res.json({ success: true, progress: user.progress });
+    } else {
+        res.status(404).json({ success: false, message: "❌ User not found" });
     }
 });
 
