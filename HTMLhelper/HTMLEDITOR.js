@@ -1,82 +1,35 @@
 const apiUrl = "http://localhost:3000";
 
-// 🔹 Register User
-async function registerUser(email, password) {
-    const res = await fetch(`${apiUrl}/register`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-    });
-    const data = await res.json();
-    alert(data.message);
-}
+        async function register() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
 
-// 🔹 Login User
-async function loginUser(email, password) {
-    const res = await fetch(`${apiUrl}/login`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-    });
-    const data = await res.json();
-    alert(data.message);
-    if (data.success) loadProgress();
-}
+            const res = await fetch(`${apiUrl}/register`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
 
-// 🔹 Logout User
-async function logoutUser() {
-    await fetch(`${apiUrl}/logout`, { credentials: "include" });
-    alert("Logged out");
-}
+            const data = await res.json();
+            document.getElementById("message").innerText = data.message;
+        }
 
-// 🔹 Save User Progress
-async function saveProgress(progress) {
-    const res = await fetch(`${apiUrl}/save-progress`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ progress })
-    });
-    const data = await res.json();
-    alert(data.message);
-}
+        async function login() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
 
-// 🔹 Load User Progress
-async function loadProgress() {
-    const res = await fetch(`${apiUrl}/get-progress`, { credentials: "include" });
-    const data = await res.json();
-    
-    if (data.success) {
-        console.log("User Progress:", data.progress);
-        document.getElementById("progress").innerText = JSON.stringify(data.progress, null, 2);
-    }
-}
+            const res = await fetch(`${apiUrl}/login`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
 
-// 🔹 Check Login Status
-async function checkAuth() {
-    const res = await fetch(`${apiUrl}/check-auth`, { credentials: "include" });
-    const data = await res.json();
-    if (data.authenticated) {
-        loadProgress();
-    }
-}
+            const data = await res.json();
+            document.getElementById("message").innerText = data.message;
 
-// 🔹 Example Usage
-document.getElementById("registerBtn").addEventListener("click", () => {
-    registerUser("test@example.com", "password123");
-});
-
-document.getElementById("loginBtn").addEventListener("click", () => {
-    loginUser("test@example.com", "password123");
-});
-
-document.getElementById("saveProgressBtn").addEventListener("click", () => {
-    saveProgress({ level: 3, score: 200 });
-});
-
-document.getElementById("logoutBtn").addEventListener("click", logoutUser);
-
-// 🔹 Run on Page Load
-checkAuth();
+            if (data.success) {
+                window.location.href = "dashboard.html";
+            }
+        }
